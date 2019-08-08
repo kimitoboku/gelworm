@@ -1,0 +1,33 @@
+#+TITLE: gelworm
+#+AUTHOR: Kawakami Kento(@emaxser)
+#+EMAIL: emaxser@bonprosoft.com
+#+OPTIONS: ^:{}
+#+STYLE: <link rel="stylesheet" type="text/css" href="./org.css" />
+#+LANGUAGE: ja
+
+* What it this?
+It is dns server.
+This server return resolver IP address in A Record.
+
+#+begin_example console
+$ dig @localhost -p 15353 www.example.com -4
+
+; <<>> DiG 9.10.6 <<>> @localhost -p 15353 www.example.com -4
+; (2 servers found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 23324
+;; flags: qr rd; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+;; WARNING: recursion requested but not available
+
+;; QUESTION SECTION:
+;www.example.com.		IN	A
+
+;; ANSWER SECTION:
+www.example.com.	3600	IN	A	127.0.0.1
+
+;; Query time: 0 msec
+;; SERVER: 127.0.0.1#15353(127.0.0.1)
+;; WHEN: Thu Aug 08 17:56:04 JST 2019
+;; MSG SIZE  rcvd: 64
+#+end_example
