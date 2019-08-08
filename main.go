@@ -5,6 +5,7 @@ import (
 	"log"
 	"fmt"
 	"net"
+	"flag"
 
 	"github.com/miekg/dns"
 )
@@ -37,8 +38,6 @@ func gelwormHandler(w dns.ResponseWriter, r *dns.Msg){
 	m := new(dns.Msg)
 	m.SetReply(r)
 	m.Compress = false
-	log.Println(w.LocalAddr())
-	log.Println(w.RemoteAddr())
 
 	switch r.Opcode {
 	case dns.OpcodeQuery:
@@ -48,8 +47,16 @@ func gelwormHandler(w dns.ResponseWriter, r *dns.Msg){
 }
 
 
+
+var (
+	port = flag.Int("int", 15353, "Run DNS port")
+	zone = flag.String("str", ".", "Run DNS zone")
+)
+
 func main(){
-	dns.HandleFunc(".", gelwormHandler)
+	flag.Parse()
+
+	dns.HandleFunc(*zone, gelwormHandler)
 
 	port := 15353
 	server := &dns.Server{Addr: "0.0.0.0:" + strconv.Itoa(port), Net: "udp"}
