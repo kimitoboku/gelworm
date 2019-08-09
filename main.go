@@ -1,32 +1,33 @@
 package main
 
 import (
-	"strconv"
-	"log"
-	"fmt"
-	"net"
 	"flag"
+	"fmt"
+	"log"
+	"net"
+	"strconv"
 
 	"github.com/miekg/dns"
 )
 
-
-func handlerQuery(m *dns.Msg, w dns.ResponseWriter){
+func handlerQuery(m *dns.Msg, w dns.ResponseWriter) {
 	for _, q := range m.Question {
 		switch q.Qtype {
 		case dns.TypeA:
 			log.Printf("Query for %s\n", q.Name)
 			remoteAddr := w.RemoteAddr().(*net.UDPAddr).IP
-			log.Println(remoteAddr)
-			rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, remoteAddr))
+			remotePort := w.RemoteAddr().(*net.UDPAddr).Port
+			log.Printf("A: %s, TTL:%d\n", remoteAddr, remotePort)
+			rr, err := dns.NewRR(fmt.Sprintf("%s %d IN A %s", q.Name, remotePort, remoteAddr))
 			if err == nil {
 				m.Answer = append(m.Answer, rr)
 			}
 		case dns.TypeAAAA:
 			log.Printf("Query for %s\n", q.Name)
 			remoteAddr := w.RemoteAddr().(*net.UDPAddr).IP
-			log.Println(remoteAddr)
-			rr, err := dns.NewRR(fmt.Sprintf("%s AAAA %s", q.Name, remoteAddr))
+			remotePort := w.RemoteAddr().(*net.UDPAddr).Port
+			log.Printf("A: %s, TTL:%d\n", remoteAddr, remotePort)
+			rr, err := dns.NewRR(fmt.Sprintf("%s %d IN AAAA %s", q.Name, remotePort, remoteAddr))
 			if err == nil {
 				m.Answer = append(m.Answer, rr)
 			}
@@ -34,7 +35,7 @@ func handlerQuery(m *dns.Msg, w dns.ResponseWriter){
 	}
 }
 
-func gelwormHandler(w dns.ResponseWriter, r *dns.Msg){
+func gelwormHandler(w dns.ResponseWriter, r *dns.Msg) {
 	m := new(dns.Msg)
 	m.SetReply(r)
 	m.Compress = false
@@ -46,15 +47,13 @@ func gelwormHandler(w dns.ResponseWriter, r *dns.Msg){
 	w.WriteMsg(m)
 }
 
-
-
 var (
 	port = flag.Int("port", 15353, "Run DNS port")
 	zone = flag.String("zone", ".", "Run DNS zone")
 	host = flag.String("host", "0.0.0.0", "Run DNS host")
 )
 
-func main(){
+func main() {
 	flag.Parse()
 
 	dns.HandleFunc(*zone, gelwormHandler)
