@@ -49,8 +49,9 @@ func gelwormHandler(w dns.ResponseWriter, r *dns.Msg){
 
 
 var (
-	port = flag.Int("int", 15353, "Run DNS port")
-	zone = flag.String("str", ".", "Run DNS zone")
+	port = flag.Int("port", 15353, "Run DNS port")
+	zone = flag.String("zone", ".", "Run DNS zone")
+	host = flag.String("host", "0.0.0.0", "Run DNS host")
 )
 
 func main(){
@@ -59,7 +60,8 @@ func main(){
 	dns.HandleFunc(*zone, gelwormHandler)
 
 	port := 15353
-	server := &dns.Server{Addr: "0.0.0.0:" + strconv.Itoa(port), Net: "udp"}
+	server := &dns.Server{Addr: *host + ":" + strconv.Itoa(port), Net: "udp"}
+	log.Printf("%s zone DNS Server run %s:%d\n", *zone, *host, port)
 	err := server.ListenAndServe()
 	defer server.Shutdown()
 	if err != nil {
