@@ -57,10 +57,8 @@ func main() {
 	flag.Parse()
 
 	dns.HandleFunc(*zone, gelwormHandler)
-
-	port := 15353
-	server := &dns.Server{Addr: *host + ":" + strconv.Itoa(port), Net: "udp"}
-	log.Printf("%s zone DNS Server run %s:%d\n", *zone, *host, port)
+	server := &dns.Server{Addr: *host + ":" + strconv.Itoa(*port), Net: "udp"}
+	log.Printf("%s zone DNS Server run %s:%d\n", *zone, *host, *port)
 	err := server.ListenAndServe()
 	defer server.Shutdown()
 	if err != nil {
