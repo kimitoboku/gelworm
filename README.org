@@ -9,6 +9,12 @@
 It is dns server.
 This server return resolver IP address in A Record.
 
+** Run
+   #+begin_src console
+$ go get github.com/kimitoboku/gelworm
+$ gelworm
+   #+end_src
+
 #+begin_example console
 $ dig @localhost -p 15353 www.example.com -4
 
