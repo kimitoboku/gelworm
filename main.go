@@ -17,8 +17,11 @@ func handlerQuery(m *dns.Msg, w dns.ResponseWriter) {
 			log.Printf("Query for %s\n", q.Name)
 			remoteAddr := w.RemoteAddr().(*net.UDPAddr).IP
 			remotePort := w.RemoteAddr().(*net.UDPAddr).Port
-			log.Printf("A: %s, TTL:%d\n", remoteAddr, remotePort)
-			rr, err := dns.NewRR(fmt.Sprintf("%s %d IN A %s", q.Name, remotePort, remoteAddr))
+			if *ttl == -1 {
+				*ttl = remotePort
+			}
+			log.Printf("A: %s, TTL:%d\n", remoteAddr, *ttl)
+			rr, err := dns.NewRR(fmt.Sprintf("%s %d IN A %s", q.Name, *ttl, remoteAddr))
 			if err == nil {
 				m.Answer = append(m.Answer, rr)
 			}
@@ -26,8 +29,11 @@ func handlerQuery(m *dns.Msg, w dns.ResponseWriter) {
 			log.Printf("Query for %s\n", q.Name)
 			remoteAddr := w.RemoteAddr().(*net.UDPAddr).IP
 			remotePort := w.RemoteAddr().(*net.UDPAddr).Port
-			log.Printf("A: %s, TTL:%d\n", remoteAddr, remotePort)
-			rr, err := dns.NewRR(fmt.Sprintf("%s %d IN AAAA %s", q.Name, remotePort, remoteAddr))
+			if *ttl == -1 {
+				*ttl = remotePort
+			}
+			log.Printf("A: %s, TTL:%d\n", remoteAddr, *ttl)
+			rr, err := dns.NewRR(fmt.Sprintf("%s %d IN AAAA %s", q.Name, *ttl, remoteAddr))
 			if err == nil {
 				m.Answer = append(m.Answer, rr)
 			}
@@ -51,6 +57,7 @@ var (
 	port = flag.Int("port", 15353, "Run DNS port")
 	zone = flag.String("zone", ".", "Run DNS zone")
 	host = flag.String("host", "0.0.0.0", "Run DNS host")
+	ttl = flag.Int("ttl", -1, "DNS TTL")
 )
 
 func main() {
